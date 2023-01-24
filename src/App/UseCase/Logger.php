@@ -5,62 +5,79 @@ namespace App\UseCase;
 use App\Entity\Log;
 use App\interfaces\ILog;
 use App\interfaces\ILogger;
-use App\Constants\Levels;
+
 class Logger implements ILogger
 {
-
   private $log;
-  private $levels = [];
-  private $encrypt;
+  private $appName;
 
-  public function __construct($projetctName)
-  {
-    $this->levels = Levels::LEVEL;
-    $this->encrypt = new Encrypt($projetctName);
-  } 
 
-  	/**
-	 * @return bool
-	 */
-  private function verifyLevel($currentLevel): bool
+  public function __construct()
   {
-    return in_array(strtoupper($currentLevel), $this->levels);
+    $this->appName = $_ENV['APP_NAME'] ? $_ENV['APP_NAME'] : 'ExampleApp';
   }
 
-
-  public function makeLog($currentLevel, $message, $evidence = '', $stacktrace = ''): void
-  {    
-    if (!$this->verifyLevel($currentLevel)) {
-      var_dump($currentLevel);
-      throw new \Exception('Invalid log level');
-    }
-
-
-    $date = date(DATE_ATOM);
-    $level = strtoupper($currentLevel);
-
-    $this->log = new Log($message, $date, $level, $evidence, $stacktrace);
-
-  }
-
-
-	/**
-	 * @return ILog
-	 */
-  public function outputLogObject(): ILog
+  /**
+   * @param string $message
+   * @param string $evidence
+   * @param array $optionals
+   * 
+   * @return ILog
+   */
+  public function info(string $message, string $evidence = "", array $optionals): void
   {
-    return $this->log;
+    $this->log = new Log($message, date('Y-m-d H:i:s'), 'INFO', $this->createHash($evidence), '', $optionals);
+    echo json_encode($this->outputLog());
+    echo "\n";
   }
 
-  public function outputLogInSpecificObject(): Array
+  /**
+   *
+   * @param string $message
+   * @param string $evidence
+   * @param string $stacktrace
+   * @param array $optionals
+   * @return ILog
+   */
+  public function error(string $message, string $evidence = "", string $stacktrace, array $optionals): void
+  {
+    $this->log = new Log($message, date('Y-m-d H:i:s'), 'ERROR', $this->createHash($evidence), $this->createHash($stacktrace), $optionals);
+    echo json_encode($this->outputLog());
+    echo "\n";
+
+  }
+
+  private function createHash($content): string
+  {
+    $contentInB64 = base64_encode($content);
+    $contentInMD5 = md5($contentInB64);
+
+    $jsonContent = json_encode(
+      array(
+        'app' => $this->appName,
+        'hash' => $contentInMD5,
+        'content' => $contentInB64,
+        'parse_evidence' => 'true',
+        'parse_json' => 'true',
+      )
+    );
+
+    echo ($jsonContent);
+    echo "\n";
+
+    return $this->appName . ":" . $contentInMD5;
+  }
+
+  private function outputLog(): array
   {
     return array(
       'parse_json' => 'true',
       'message' => $this->log->getMessage(),
       '@timestamp' => $this->log->getDate(),
       'level' => $this->log->getlevel(),
-      'evidence' => $this->encrypt->encryptToB64($this->log->getEvidence()),
-      'stacktrace' => $this->encrypt->encryptToMD5($this->log->getStacktrace()) 
+      'evidence' => $this->log->getEvidence(),
+      'stacktrace' => $this->log->getStacktrace(),
+      'optionals' => $this->log->getOptionals(),
     );
   }
 

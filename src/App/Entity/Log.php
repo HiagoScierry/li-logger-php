@@ -12,19 +12,24 @@ class Log implements ILog
   private $evidence;
   private $stacktrace;
 
+  private $optionals;
   /**
    * @param mixed $message 
    * @param mixed $date 
    * @param mixed $level 
    * @param mixed $project 
+   * @param mixed $evidence
+   * @param mixed $stacktrace
+   * @param array $optionals
    */
-  public function __construct($message, $date, $level, $evidence, $stacktrace)
+  public function __construct($message, $date, $level, $evidence, $stacktrace, $optionals = array())
   {
     $this->message = $message;
     $this->date = $date;
     $this->level = $level;
     $this->evidence = $evidence;
     $this->stacktrace = $stacktrace;
+    $this->optionals = $optionals;
   }
 
   /**
@@ -56,7 +61,8 @@ class Log implements ILog
   /**
    * @return string 
    */
-  public function getEvidence(): string{
+  public function getEvidence(): string
+  {
     return $this->evidence;
   }
 
@@ -66,6 +72,14 @@ class Log implements ILog
   public function getStacktrace(): string
   {
     return $this->stacktrace;
+  }
+
+  /**
+   * @return array 
+   */
+  public function getOptionals(): array
+  {
+    return $this->optionals;
   }
 
 }

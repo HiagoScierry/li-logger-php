@@ -2,17 +2,14 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use App\UseCase\Encrypt;
 use App\UseCase\Logger;
-use Dotenv\Dotenv;
 
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 
-$logger = new Logger("ExampleProjectName");
 
-$logger->makeLog('info', 'This is a message', 'This is a evidence', 'This is a stacktrace');
+echo "INFO LOG \n";
+$logger = new Logger();
+$logger->info('Teste de log', 'evidence', array());
 
-$log = $logger->outputLogInSpecificObject();
+echo "ERROR LOG \n";
 
-var_dump($log);
+$logger->error('Teste de log', 'evidence', 'stacktrace', array());

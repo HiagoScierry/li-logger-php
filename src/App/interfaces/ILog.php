@@ -3,7 +3,7 @@
 namespace App\interfaces;
 interface ILog {
   
-  public function __construct($message, $date, $level, $evidence, $stacktrace);
+  public function __construct($message, $date, $level, $evidence, $stacktrace, $optionals = array());
  
   public function getMessage(): string;
   
@@ -15,5 +15,5 @@ interface ILog {
   
   public function getStacktrace(): string;
 
-  
+  public function getOptionals(): array;
 }
