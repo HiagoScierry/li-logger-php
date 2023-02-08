@@ -26,9 +26,9 @@ class Logger implements ILogger
    */
   public function info(string $message, string $evidence = "", array $optionals): void
   {
-    $this->log = new Log($message, date('Y-m-d H:i:s'), 'INFO', $this->createHash($evidence), '', $optionals);
-    echo json_encode($this->outputLog());
-    echo "\n";
+    $this->log = new Log($message, date('Y-m-d'), 'INFO', $this->createHash($evidence), '', $optionals);
+    print(json_encode($this->outputLog()));
+    // echo "\n";
   }
 
   /**
@@ -41,10 +41,8 @@ class Logger implements ILogger
    */
   public function error(string $message, string $evidence = "", string $stacktrace, array $optionals): void
   {
-    $this->log = new Log($message, date('Y-m-d H:i:s'), 'ERROR', $this->createHash($evidence), $this->createHash($stacktrace), $optionals);
-    echo json_encode($this->outputLog());
-    echo "\n";
-
+    $this->log = new Log($message, date('Y-m-d'), 'ERROR', $this->createHash($evidence), $this->createHash($stacktrace), $optionals);
+    print(json_encode($this->outputLog()));
   }
 
   private function createHash($content): string
@@ -62,8 +60,7 @@ class Logger implements ILogger
       )
     );
 
-    echo ($jsonContent);
-    echo "\n";
+    print($jsonContent);
 
     return $this->appName . ":" . $contentInMD5;
   }
